@@ -15,3 +15,5 @@ def get_sentiment(file_path):
     print("Negative sentiment score:", sentiment_scores['neg'])
     print("Neutral sentiment score:", sentiment_scores['neu'] * 100)
     print("Compound sentiment score:", sentiment_scores['compound'] * 100)
+
+    return sentiment_scores
