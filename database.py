@@ -33,6 +33,11 @@ def AddCallRecord(sentimentScore, clientID):
     today = datetime.date.today()
     cursor.execute("INSERT INTO CallRecord (Sentiment, CallDate, ClientID) VALUES (?, ?, ?)", (sentimentScore, today, clientID))
 
+def UpdateOverallSentiment(clientID):
+    cursor.execute("SELECT AVG(Sentiment) FROM CallRecord WHERE ClientID = ?", (clientID,))
+    overallSentiment = cursor.fetchone()[0]
+    cursor.execute("UPDATE Clients SET OverallSentiment = ? WHERE ClientID = ?", (overallSentiment, clientID))
+    
 def Disconnect():
     conn.commit()
     conn.close()

@@ -13,5 +13,6 @@ clientNumber = str(random.randint(80000000, 99999999))
 
 clientID = database.AddClient(clientNumber, "<NAME>", sentiment_scores['compound'])
 database.AddCallRecord(sentiment_scores['compound'], clientID)
+database.UpdateOverallSentiment(clientID)
 
 database.Disconnect()
