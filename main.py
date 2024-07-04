@@ -2,6 +2,7 @@ import whisper_transcriber
 import sentiment
 import random
 import database
+import json
 
 database.Connect()
 database.CreateTables()
@@ -14,5 +15,13 @@ clientNumber = str(random.randint(80000000, 99999999))
 clientID = database.AddClient(clientNumber, "<NAME>", sentiment_scores['compound'])
 database.AddCallRecord(sentiment_scores['compound'], clientID)
 database.UpdateOverallSentiment(clientID)
+
+data = {
+    "name": "<NAME>",
+    "clientNumber": clientNumber
+}
+
+with open("data.json", "w") as file:
+    json.dump(data, file)
 
 database.Disconnect()
