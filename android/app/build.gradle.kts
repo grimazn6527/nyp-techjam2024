@@ -42,6 +42,12 @@ chaquopy {
     productFlavors {
         getByName("py311") { version = "3.11" }
     }
+
+    defaultConfig{
+        pip{
+            install("nltk")
+        }
+    }
 }
 
 dependencies {

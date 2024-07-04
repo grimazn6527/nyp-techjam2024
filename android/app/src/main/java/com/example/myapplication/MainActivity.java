@@ -40,9 +40,6 @@ import java.security.PrivateKey;
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextView tvTest;
-    private Button btnTest;
-    private Button btnTest2;
     private DatabaseHelper myDB;
     private static final int PICK_AUDIO_REQUEST = 1;
 
@@ -51,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private Button btnUploadAudioFile;
     private Button btnCompile;
     private EditText etPhoneNumber;
+    private TextView tvTest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,54 +56,22 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
+        //Initialize database
         myDB = new DatabaseHelper(MainActivity.this);
         clientsContainer = (LinearLayout) findViewById(R.id.clients_container);
         loadClients();
-
-        tvTest = (TextView) findViewById(R.id.textView);
-        etPhoneNumber = (EditText) findViewById(R.id.editTextPhone);
-        btnCompile = (Button) findViewById(R.id.btnCompile);
-        btnUploadAudioFile = (Button) findViewById(R.id.btnUploadFile);
-        btnUploadAudioFile.setOnClickListener(v -> openAudioPicker());
-
-        File output = new File(getApplicationContext().getExternalFilesDir(null),"main.py");
-
         //Set up python
         if(!Python.isStarted()){
             Python.start(new AndroidPlatform(this));
         }
 
-        //Create python instance
-        Python py = Python.getInstance();
-        //Run python file
-        PyObject pyobj = py.getModule("main");
-        PyObject testobj = pyobj.callAttr("testfunc");
-        if(tvTest != null)
-            tvTest.setText(testobj.toString());
+        tvTest = (TextView) findViewById(R.id.textView);
+        etPhoneNumber = (EditText) findViewById(R.id.editTextPhone);
+        btnCompile = (Button) findViewById(R.id.btnCompile);
+        btnCompile.setOnClickListener(v -> runPythonScript());
+        btnUploadAudioFile = (Button) findViewById(R.id.btnUploadFile);
+        btnUploadAudioFile.setOnClickListener(v -> openAudioPicker());
 
-        btnTest = (Button) findViewById(R.id.button);
-        btnTest.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                myDB.addClient("Wallace Kwek", 98842221, 20.5);
-            }
-
-        });
-
-        btnTest2 = (Button) findViewById(R.id.button2);
-        btnTest2.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                myDB.addCallRecord(10, "2024-10-04", "Wallace Kwek");
-            }
-
-        });
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
     }
     
     private void loadClients(){
@@ -181,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
             send_data.put("name", "<NAME>");  // Replace <NAME> with the actual name if needed
             send_data.put("clientNumber", clientNumber);
 
-            File file = new File(getFilesDir(), "data.json");
+            File file = new File(getFilesDir(), "callData.json");
             FileWriter writer = new FileWriter(file);
             writer.write(send_data.toString());
             writer.close();
@@ -191,6 +157,17 @@ public class MainActivity extends AppCompatActivity {
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    private void runPythonScript(){
+        //Create python instance
+        Python py = Python.getInstance();
+
+        //Run python file and function main()
+        PyObject pyobj = py.getModule("main");
+        PyObject testobj = pyobj.callAttr("main");
+        String result = testobj.toString();
+        tvTest.setText(result);
     }
 
    /* private void storeDataInArrays(){
