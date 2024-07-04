@@ -14,7 +14,7 @@ whisper_transcriber.transcribeAudio(file_path)
 sentiment_scores = sentiment.get_sentiment("audiotranscribed.txt")
 client_name = extractname.GetName("audiotranscribed.txt")
 
-client_id = database.AddClient(client_number, "<NAME>", sentiment_scores['compound'])
+client_id = database.AddClient(client_number, client_name, sentiment_scores['compound'])
 database.AddCallRecord(sentiment_scores['compound'], client_id)
 database.UpdateOverallSentiment(client_id)
 
