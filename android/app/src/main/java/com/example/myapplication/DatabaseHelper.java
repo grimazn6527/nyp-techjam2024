@@ -25,29 +25,33 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String createClientsTable = "CREATE TABLE Clients (" +
                 "ClientID INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "ClientName TEXT NOT NULL);";
+                "ClientName TEXT NOT NULL, " +
+                "PhoneNumber INTEGER NOT NULL, " +
+                "OverallSentiment REAL NOT NULL);";
         db.execSQL(createClientsTable);
 
-        String createContactsTable = "CREATE TABLE Contacts (" +
-                "ContactID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+        String createCallRecordTable = "CREATE TABLE CallRecord (" +
+                "Sentiment REAL NOT NULL, " +
+                "CallDate DATE NOT NULL, " +
                 "ClientID INTEGER NOT NULL, " +
-                "ContactName TEXT NOT NULL, " +
-                "PhoneNumber INTEGER NOT NULL, " +
                 "FOREIGN KEY (ClientID) REFERENCES Clients(ClientID));";
-        db.execSQL(createContactsTable);
+        db.execSQL(createCallRecordTable);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS Clients");
-        db.execSQL("DROP TABLE IF EXISTS Contacts");
+        db.execSQL("DROP TABLE IF EXISTS CallRecord");
         onCreate(db);
     }
 
-    public void addClient(String clientName) {
+    public void addClient(String clientName, int phoneNumber, double overallSentiment) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put("ClientName", clientName);
+        cv.put("PhoneNumber", phoneNumber);
+        cv.put("OverallSentiment", overallSentiment);
+
         long result = db.insert("Clients", null, cv);
 
         if(result == -1){
@@ -57,14 +61,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void addContact(String contactName, int phoneNumber ,String clientName) {
+    public void addCallRecord(double sentiment, String callDate ,String clientName) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
-        cv.put("ContactName", contactName);
-        cv.put("PhoneNumber", phoneNumber);
-
+        cv.put("Sentiment", sentiment);
+        cv.put("CallDate", callDate);
         int clientID = getClientID(clientName);
         cv.put("ClientID", clientID);
+
         long result = db.insert("Contacts", null, cv);
 
         if(result == -1){
@@ -92,8 +96,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.rawQuery("SELECT * FROM Clients", null);
     }
 
-    public Cursor getContactByClientID(int clientID){
+    public Cursor getCallRecordByClientID(int clientID){
         SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery("SELECT * FROM Contacts WHERE ClientID = ?", new String[]{String.valueOf(clientID)});
+        return db.rawQuery("SELECT * FROM CallRecord WHERE ClientID = ?", new String[]{String.valueOf(clientID)});
     }
 }

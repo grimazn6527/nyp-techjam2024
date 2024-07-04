@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         btnTest.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                myDB.addClient("Wallace Kwek");
+                myDB.addClient("Wallace Kwek", 98842221, 20.5);
             }
 
         });
@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         btnTest2.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                myDB.addContact("Dumbass", 995, "Wallace Kwek");
+                myDB.addCallRecord(10, "2024-10-04", "Wallace Kwek");
             }
 
         });
