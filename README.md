@@ -119,7 +119,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 Sean - seann.lyj@gmail.com
 
-Wallace - 
+Wallace - wallacekwek.business@gmail.com
 
 Faizal - md.faizal.md.j@gmail.com
 
