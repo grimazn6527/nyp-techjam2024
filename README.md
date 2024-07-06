@@ -3,7 +3,6 @@
 <p align="center"><img align="center" width="280" src="images/icon.png"/></p>
 
 <div align="center">
-  <h3 align="center">VOCAL INSIGHTS</h3>
 
   <p align="center">
     Summarize, Analyze, and Optimize Your Sales Calls with AI-Powered Sentiment Tracking
