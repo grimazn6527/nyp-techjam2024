@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Sales Helper</title>
+    <style>
+        .header {
+            text-align: center;
+            margin-bottom: 20px; /* Adjust as needed */
+        }
+
+        .header-link {
+            margin: 0 10px; /* Space between links */
+            color: #fff; /* Changed to white */
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 16px; /* Adjust font size as needed */
+            transition: color 0.3s ease; /* Smooth transition for color and text-decoration */
+        }
+
+        .header-divider {    
+            border: 0; /* Remove default border */
+            height: 2px; /* Increase the height of the line for visibility */
+            background-color: #fff; /* Changed to white for contrast */
+            margin-bottom: 20px; /* Adjust margin for spacing */
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #000; /* Changed to black */
+            color: #fff; /* Changed to white */
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+        .form-container {
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #FE2C55;; /* Border color changed to white */
+            width: 50%;
+            max-width: 550px;
+        }
+        .container-width {
+            max-width: 550px; /* Example width, adjust as needed */
+            margin: auto; /* Center align the div */
+            padding: 0 20px; /* Optional: Add some padding inside the divs */
+        }
+        input[type="text"], input[type="file"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #fff; /* Lighter for visibility */
+            background-color: #fff; /* Darker input fields */
+            color: #000; /* Text color changed to white */
+            border-radius: 4px;
+        }
+        input[type="submit"], .back-button, .button-style {
+            background-color: #FE2C55;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            width: 100%;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            color: #fff; /* Text color changed to white */
+            border: 1px solid #fff; /* Border color changed to white */
+            border-radius: 4px;
+        }
+        .back-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #0078D4;
+            color: white;
+            border: none;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .button-style {
+            background-color: #FE2C55;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            width: 100%;
+            transition: transform 0.3s ease;
+        }
+
+        .button-style:hover {
+            transform: translateY(-2px);
+        }
+
+        input[type="text"], input[type="file"], input[type="submit"], .back-button {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        input[type="text"]:hover, input[type="file"]:hover, .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px #FE2C55;
+        }
+        .header-link:hover {
+            color: #FE2C55; /* Change color on hover */
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Div -->
+    <div class="header">
+        <a href="/" class="header-link">Home</a>
+        <a href="/customerinfo" class="header-link">View Customers</a>
+    </div>
+    <hr class="header-divider"> <!-- Separating line -->
+
+    <h1 data-aos="fade-down">Smart Sales Helper</h1>
+    <div class="form-container" data-aos="fade-up" data-aos-delay="100">
+        <form id="audioForm">
+            <input type="text" id="customerName" name="customerName" placeholder="Customer Name" required>
+            <input type="text" id="customerPhone" name="customerPhone" placeholder="Customer Phone" required>
+            <input type="file" id="audioFile" name="audioFile" accept="audio/*">
+            <input type="submit" value="Process Audio">
+        </form>
+    </div>
+    <div id="result" class="result container-width" data-aos="fade-up" data-aos-delay="300">
+        <p>Click "Process Audio" after filling in the customer's details</p>
+    </div>
+    <script>
+        document.getElementById('audioForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            // Disable the submit button
+            var submitButton = document.querySelector('input[type="submit"]');
+            submitButton.disabled = true;
+            document.getElementById('result').innerHTML = '<p>Loading...</p>';
+            
+            var formData = new FormData();
+            var audioFile = document.getElementById('audioFile').files[0];
+            var customerName = document.getElementById('customerName').value;
+            var customerPhone = document.getElementById('customerPhone').value;
+            formData.append('audioFile', audioFile);
+            formData.append('customerName', customerName);
+            formData.append('customerPhone', customerPhone);
+            fetch('/process_audio', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                document.getElementById('result').innerHTML = `
+                    <p><strong>SUMMARY</strong></p>
+                    <p>${data.summarized_transcription}</p>
+                    <p><strong>SENTIMENT OVERVIEW</strong></p>
+                    <p>Overall Mood: <strong>${data.sentiment.compound >= 0.05 ? 'Positive' : data.sentiment.compound <= -0.05 ? 'Negative' : 'Neutral'}</strong><p>
+                        
+                    <div id="transcriptionContainer">
+                        <button id="toggleTranscription" class="button-style">Show Full Transcription</button>
+                        <p id="transcription" style="display: none;">${data.transcription}</p>
+                    </div>
+                    
+
+                    <!--
+                    <ul>
+                        <li>Overall Mood: <strong>${data.sentiment.compound >= 0.05 ? 'Positive' : data.sentiment.compound <= -0.05 ? 'Negative' : 'Neutral'}</strong></li>
+                        <li>Positivity Level: <strong>${data.sentiment.pos >= 0.7 ? 'Highly Positive' : data.sentiment.pos >= 0.4 ? 'Moderately Positive' : 'Slightly Positive or Neutral'}</strong></li>
+                        <li>Negativity Level: <strong>${data.sentiment.neg >= 0.7 ? 'Highly Negative' : data.sentiment.neg >= 0.4 ? 'Moderately Negative' : 'Slightly Negative or Neutral'}</strong></li>
+                        <li>Neutrality Level: <strong>${data.sentiment.neu > 0.8 ? 'Mostly Neutral' : data.sentiment.neu > 0.6 ? 'Somewhat Neutral' : 'Mixed Feelings'}</strong></li>
+                    </ul>
+                    <p>Positive Sentiment: ${data.sentiment.pos * 100}</p>
+                    <p>Negative Sentiment: ${data.sentiment.neg * 100}</p>
+                    <p>Neutral Sentiment: ${data.sentiment.neu * 100}</p>
+                    <p>Compound Sentiment: ${data.sentiment.compound * 100}</p>
+                    -->
+                `;
+
+                    document.getElementById('toggleTranscription').addEventListener('click', function() {
+                    var transcription = document.getElementById('transcription');
+                    if (transcription.style.display === 'none') {
+                        transcription.style.display = 'block';
+                        this.textContent = 'Hide Transcription';
+                    } else {
+                        transcription.style.display = 'none';
+                        this.textContent = 'Show Full Transcription';
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            })
+            .finally(() => {
+                // Re-enable the submit button after the fetch operation is complete
+                submitButton.disabled = false;
+            });
+        });
+
+        AOS.init(); // Initialize AOS
+    </script>
+</body>
+</html>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Sentiments</title>
+    <style>
+        .header {
+            text-align: center;
+            margin-bottom: 20px; /* Adjust as needed */
+        }
+
+        .header-link {
+            margin: 0 10px; /* Space between links */
+            color: #fff; /* Changed to white */
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 16px; /* Adjust font size as needed */
+            transition: color 0.3s ease; /* Smooth transition for color and text-decoration */
+        }
+
+        .header-divider {    
+            border: 0; /* Remove default border */
+            height: 2px; /* Increase the height of the line for visibility */
+            background-color: #fff; /* Changed to white for contrast */
+            margin-bottom: 20px; /* Adjust margin for spacing */
+        }
+
+        .header-link:hover {
+            color: #FE2C55; /* Change color on hover */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #000; /* Updated to match index.html */
+            color: #fff; /* Updated to match index.html */
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        table {
+            border-collapse: separate; /* Change from collapse to separate */
+            border-spacing: 0; /* Remove space between cells */
+            width: 40%;
+            border: 1px solid #FE2C55; /* Border color changed to white */
+            border-radius: 10px; /* Rounded corners for the table */
+            overflow: hidden; /* Ensures the inner content respects the table's border radius */
+        }
+        th:first-child {
+            border-top-left-radius: 10px; /* Rounded top left corner */
+        }
+
+        th:last-child {
+            border-top-right-radius: 10px; /* Rounded top right corner */
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px;
+            color: #fff; /* Ensure text color is white for readability */
+        }
+        th {
+            background-color: #FE2C55; /* Change this to your desired header row color */
+            color: #fff; /* Adjust text color as needed */
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        tr:hover {
+            transition: transform 0.3s ease; /* Smooth transition for scaling */
+            background-color: #FE2C55; /* Hover effect to match index.html style */
+            margin: 0.5em 0; /* Add margin to separate rows */
+        }
+        tr:hover {
+            z-index: 1; /* Ensure the scaled row is above others */
+        }
+
+        tbody tr {
+            transition: transform 0.3s ease, background-color 0.3s ease,  text-shadow 0.3s ease;; /* Smooth transition for transform and background-color */
+        }
+
+        tbody tr:hover {
+            background-color: #FE2C55; /* Darker background on hover */
+            transform: scale(1.02); /* Slightly scale up */
+            cursor: pointer; /* Change cursor to indicate interactivity */        
+            text-shadow: 1px 1px 0 #000; /* Text shadow to simulate bold */
+        }
+
+        .back-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #FE2C55; /* Updated to match index.html */
+            color: white;
+            border: none;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: transform 0.3s ease; /* Smooth transition for hover effect */
+        }
+        .back-button:hover {
+            transform: translateY(-2px); /* Hover effect to match index.html */
+            box-shadow: 0 4px 6px #FE2C55; /* Shadow effect for depth */
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Div -->
+    <div class="header">
+        <a href="/" class="header-link">Home</a>
+        <a href="/customerinfo" class="header-link">View Customers</a>
+    </div>
+    <hr class="header-divider" data-aos="fade-left"> <!-- Applying AOS -->
+
+    <h1 data-aos="zoom-in">Customer Sentiments</h1>
+    <table id="customersTable" data-aos="fade-up">
+        <thead>
+            <tr>
+                <th>Customer Name</th>
+                <th>Phone Number</th>
+                <th>Sentiment Score</th>
+                <th>Satisfaction Level</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Customer rows will be inserted here by JavaScript -->
+        </tbody>
+    </table>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/get_customers')
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.getElementById('customersTable').getElementsByTagName('tbody')[0];
+                data.forEach(customer => {
+                    let row = tableBody.insertRow();
+                    let satisfactionLevel = getCustomerSatisfaction(customer.OverallSentiment);
+                    row.innerHTML = `<td>${customer.ClientName}</td><td>${customer.PhoneNumber}</td><td>${customer.OverallSentiment}</td><td>${satisfactionLevel}</td>`;
+                    row.addEventListener('click', () => {
+                    window.location.href = `/call_records?clientID=${customer.ClientID}`;
+                    });
+                });
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        function getCustomerSatisfaction(sentimentScore) {
+        if (sentimentScore >= 0.5) return 'Very Satisfied';
+        else if (sentimentScore >= 0.2) return 'Satisfied';
+        else if (sentimentScore > -0.2 && sentimentScore < 0.2) return 'Neutral';
+        else if (sentimentScore <= -0.2 && sentimentScore > -0.5) return 'Unsatisfied';
+        else return 'Very Unsatisfied';
+    }
+    </script>
+
+    <script>
+        AOS.init(); // Initialize AOS
+    </script>
+</body>
+</html>

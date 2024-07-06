@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Call Records</title>
+    <style>
+        .header {
+            text-align: center;
+            margin-bottom: 20px; /* Adjust as needed */
+        }
+
+        .header-link {
+            margin: 0 10px; /* Space between links */
+            color: #fff; /* Changed to white */
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 16px; /* Adjust font size as needed */
+            transition: color 0.3s ease; /* Smooth transition for color and text-decoration */
+        }
+
+        .header-divider {    
+            border: 0; /* Remove default border */
+            height: 2px; /* Increase the height of the line for visibility */
+            background-color: #fff; /* Changed to white for contrast */
+            margin-bottom: 20px; /* Adjust margin for spacing */
+        }
+
+        .header-link:hover {
+            color: #FE2C55; /* Change color on hover */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #000;
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+        }
+        #clientInfoTable {
+            user-select: none; /* Prevents text selection */
+            border-collapse: separate; /* Change from collapse to separate */
+            border-spacing: 0; /* Remove space between cells */
+            width: 80%;
+            border: 1px solid #FE2C55; /* Border color changed to white */
+            overflow: hidden; /* Ensures the inner content respects the table's border radius */
+        }
+
+        #clientInfoTable th, #clientInfoTable td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        #clientInfoTable th:nth-child(1), #clientInfoTable td:nth-child(1) {
+            background-color: #FE2C55; /* Example color */
+            color: white; /* Example text color */
+        }
+
+        #clientInfoTable th:first-child, #clientInfoTable td:first-child {
+            width: 20%; /* Adjust this value as needed to make the first column smaller */
+        }
+
+        table {
+            user-select: none; /* Prevents text selection */
+            border-collapse: separate; /* Change from collapse to separate */
+            border-spacing: 0; /* Remove space between cells */
+            width: 80%;
+            border: 1px solid #FE2C55; /* Border color changed to white */
+            overflow: hidden; /* Ensures the inner content respects the table's border radius */
+        }
+        th, td {
+            text-align: left;
+            padding: 10px;
+        }
+
+        th {
+            background-color: #FE2C55; /* Change this to your desired header row color */
+            color: #fff; /* Adjust text color as needed */
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .chart-container {
+            width: 80%; /* Adjust based on your layout needs */
+            max-width: 400px; /* Prevents the chart from becoming too large */
+            aspect-ratio: 16 / 9; /* Sets a specific aspect ratio for the chart */
+            margin: auto; /* Centers the chart container if within a flex or grid layout */
+            padding: 20px 0; /* Adds vertical padding without affecting width */
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Header Div -->
+    <div class="header">
+        <a href="/" class="header-link">Home</a>
+        <a href="/customerinfo" class="header-link">View Customers</a>
+    </div>
+    <hr class="header-divider" data-aos="fade-right"> <!-- Applying AOS -->
+
+    <h1 data-aos="zoom-in">Customer Information</h1>
+
+
+    <table id="clientInfoTable" data-aos="fade-right">
+        <tbody>
+            <tr>
+                <th>Client Name</th>
+                <td id="clientName">Loading...</td>
+            </tr>
+            <tr>
+                <th>Phone Number</th>
+                <td id="clientPhone">Loading...</td>
+            </tr>
+        </tbody>
+    </table>
+
+
+    <div class="chart-container" data-aos="zoom-in-up">
+        <canvas id="sentimentChart"></canvas>
+    </div>
+
+
+    <table id="callRecordsTable">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Overall Mood</th>
+                <th>Summary</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Call records will be inserted here by JavaScript -->
+        </tbody>
+    </table>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+            const queryParams = new URLSearchParams(window.location.search);
+            const clientID = queryParams.get('clientID');
+
+            // Fetch client information
+            fetch(`/get_client_info?clientID=${clientID}`)
+            .then(response => response.json())
+            .then(clientInfo => {
+                document.getElementById('clientName').textContent = `${clientInfo.ClientName}`;
+                document.getElementById('clientPhone').textContent = `${clientInfo.PhoneNumber}`;
+            })
+            .catch(error => console.error('Error fetching client info:', error));
+
+            fetch(`/get_call_records?clientID=${clientID}`)
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.getElementById('callRecordsTable').getElementsByTagName('tbody')[0];
+                const dates = [];
+                const sentiments = [];
+                data.forEach(record => {
+                    let sentimentText = mapSentimentScoreToText(record.Sentiment); // Convert numerical score to text
+                    let row = tableBody.insertRow();
+                    row.innerHTML = `<td>${record.CallDate}</td><td>${sentimentText}</td><td>${record.SummarizedTranscription}</td>`; // Use sentimentText
+                    dates.push(record.CallDate);
+                    sentiments.push(record.Sentiment); // Assuming you still want to use the numerical value for the chart
+                });
+                const ctx = document.getElementById('sentimentChart').getContext('2d');
+                const sentimentChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: dates,
+                        datasets: [{
+                            label: 'Sentiment Score',
+                            data: sentiments,
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        // Function to map sentiment score to text
+        function mapSentimentScoreToText(score) {
+            if (score > 0.5) return "Positive";
+            else if (score < -0.5) return "Negative";
+            else return "Neutral";
+        }
+    </script>
+
+    <script>
+        AOS.init(); // Initialize AOS
+    </script>
+</body>
+</html>
