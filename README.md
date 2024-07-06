@@ -1,5 +1,7 @@
 <!-- PROJECT LOGO -->
 <br />
+<p align="center"><img align="center" width="280" src="icons/icon.png"/></p>
+
 <div align="center">
   <h3 align="center">VOCAL INSIGHTS</h3>
 
