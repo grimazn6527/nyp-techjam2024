@@ -41,7 +41,7 @@ def AddClient(phoneNumber, clientName, sentimentScore):
     return clientID
 
 def AddCallRecord(sentimentScore, clientID, summarizedTranscription):
-    today = datetime.today() - timedelta(days=3)
+    today = datetime.today()
     cursor.execute("""
         INSERT INTO CallRecord (Sentiment, CallDate, ClientID, SummarizedTranscription) 
         VALUES (?, ?, ?, ?)
