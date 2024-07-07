@@ -7,7 +7,7 @@
   <p align="center">
     Summarize, Analyze, and Optimize Your Sales Calls with AI-Powered Sentiment Tracking
     <br />
-    <a href="https://docs.google.com/document/d/13yhlJYMC6hXpnmm49e8UTf7jq4lbdl8qM-_jj0FV6_o/edit?usp=sharing"><strong>Explore the docs »</strong></a>
+    <a href="https://docs.google.com/document/d/13yhlJYMC6hXpnmm49e8UTf7jq4lbdl8qM-_jj0FV6_o/edit?usp=sharing">Explore the docs</a>
     <br />
     <br />
     <a href="https://www.youtube.com/watch?v=23vTC4eCH6Y">View Demo</a>
